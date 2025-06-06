@@ -10,20 +10,50 @@ import { ref } from 'vue';
 import LossPlot from './components/LossPlot.vue';
 import ClassifyPlot from './components/ClassifyPlot.vue';
 
+import { connectSocket, disconnectSocket, emitEvent } from './libs/socket.js';
+import eventHub from './libs/eventHub.js';
+import { onMounted, onUnmounted } from 'vue';
+import { useSocketStore } from './store/socketStore.js';
+import { storeToRefs } from 'pinia';
+
 function clearLocalStorage() {
 	localStorage.clear();
 }
 
-const client_id = ref('');
+const socketStore = useSocketStore();
+const { client_id } = storeToRefs(socketStore);
+// const client_id = ref('');
 const resetPlotFlag = ref(false);
 
+
+// async function getID() {
+// 	client_id.value = await getClientId();
+// }
 async function getID() {
-	client_id.value = await getClientId();
+	await emitEvent('get_client_id', null);
+	// client_id.value = socketStore.client_id;
+	// console.log(client_id.value);
 }
+
+onMounted(() => {
+	eventHub.on('connect', eventHub.handleConnect);
+	eventHub.on('disconnect', eventHub.handleDisconnect);
+	eventHub.on('get_client_id', eventHub.handleGetId);
+})
+
+onUnmounted(() => {
+	eventHub.off('connect', eventHub.handleConnect);
+	eventHub.off('disconnect', eventHub.handleDisconnect);
+	eventHub.off('get_client_id', eventHub.handleGetId);
+})
+
+
 </script>
 
 <template>
 	<div>
+		<button @click="connectSocket">Connect</button>
+		<button @click="disconnectSocket">Disconnect</button>
 		<button @click="getID">GET id: {{ client_id }}</button>
 		<button @click="setReadyForTrain(client_id)">Ready</button>
 
