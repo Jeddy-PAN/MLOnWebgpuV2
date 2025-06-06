@@ -2,6 +2,7 @@ import mitt from 'mitt';
 
 const emitter = mitt();
 import { useSocketStore } from '../store/socketStore';
+import { startTrain } from '../utils/backend/CPU/tools/client';
 
 const eventHub = {
   on: emitter.on,
@@ -35,13 +36,17 @@ const eventHub = {
     const socketStore = useSocketStore();
     if (res.data == socketStore.client_id) {
         socketStore.setReady(true);
+        console.log('Client is ready');
     }   
   },
   
   // 处理get_dataset事件
   async handleGetData(res) {
-    const socketStore = useSocketStore();
-    socketStore.setRawData(res.data);
+    // const socketStore = useSocketStore();
+    // socketStore.setRawData(res.data);
+    const dataset = res.data;
+    console.log(dataset);
+    // startTrain(dataset);
   },
 
 };

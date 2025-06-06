@@ -1,17 +1,19 @@
 import Data from '../tools/DataClass';
 import { useComputeGraphStore } from '../../../../store/computeGraphStore';
+import { useSocketStore } from '../../../../store/socketStore';
 import setUpModel from './setUpModel';
 import { getClientId, fetchDataset } from '../tools/client';
 
-const startTrain = async () => {
+const startTrain = async (dataset) => {
 	const computeGraphStore = useComputeGraphStore();
+	// const socketStore = useSocketStore();
 
 	// const datasetName = 'easy_class.';
 	// startTrain(datasetName);
 
-	const client_id = await getClientId();
+	// const client_id = socketStore.client_id;
 
-	const dataset = await fetchDataset(client_id);
+	// const dataset = await fetchDataset(client_id);
 
 	// stopFlag.value = false;
 
@@ -28,5 +30,13 @@ const startTrain = async () => {
 	// 	},
 	// });
 };
+
+// const startTrain = async () => {
+// 	const computeGraphStore = useComputeGraphStore();
+// 	const socketStore = useSocketStore();
+
+// 	const client_id = socketStore.client_id;
+// 	const dataset = socketStore.rawData;
+// }
 
 export { startTrain };

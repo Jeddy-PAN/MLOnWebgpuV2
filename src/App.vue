@@ -22,6 +22,7 @@ function clearLocalStorage() {
 
 const socketStore = useSocketStore();
 const { client_id } = storeToRefs(socketStore);
+const dataSetName = ref('dataClass1.csv');
 // const client_id = ref('');
 const resetPlotFlag = ref(false);
 
@@ -31,20 +32,30 @@ const resetPlotFlag = ref(false);
 // }
 async function getID() {
 	await emitEvent('get_client_id', null);
-	// client_id.value = socketStore.client_id;
-	// console.log(client_id.value);
+}
+
+async function setReady() {
+	await emitEvent('ready_to_train', client_id.value);
+}
+
+async function startTraining() {
+	await emitEvent('get_dataset', {client_id: client_id.value, dataSetName: dataSetName.value});
 }
 
 onMounted(() => {
 	eventHub.on('connect', eventHub.handleConnect);
 	eventHub.on('disconnect', eventHub.handleDisconnect);
 	eventHub.on('get_client_id', eventHub.handleGetId);
+	eventHub.on('ready_to_train', eventHub.handleReady);
+	eventHub.on('get_dataset', eventHub.handleGetData);
 })
 
 onUnmounted(() => {
 	eventHub.off('connect', eventHub.handleConnect);
 	eventHub.off('disconnect', eventHub.handleDisconnect);
 	eventHub.off('get_client_id', eventHub.handleGetId);
+	eventHub.off('ready_to_train', eventHub.handleReady);
+	eventHub.off('get_dataset', eventHub.handleGetData);
 })
 
 
@@ -55,13 +66,13 @@ onUnmounted(() => {
 		<button @click="connectSocket">Connect</button>
 		<button @click="disconnectSocket">Disconnect</button>
 		<button @click="getID">GET id: {{ client_id }}</button>
-		<button @click="setReadyForTrain(client_id)">Ready</button>
+		<button @click="setReady">Ready</button>
 
 		<button
 			@click="
 				{
 					setFlagTrain(); // set stopFlag in GPUTraining.js to false
-					startTrain(); // start training
+					startTraining(); // start training
 				}
 			"
 		>
