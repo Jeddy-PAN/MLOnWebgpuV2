@@ -43,7 +43,7 @@ import { ref } from 'vue';
 import { useComputeGraphStore } from '../../../../store/computeGraphStore.js';
 import { useSocketStore } from '../../../../store/socketStore.js';
 import { initWebSocket, postGradients } from './network.js';
-import { emitEvent } from '../../../../libs/socket.js';
+import { submitGradients } from '../../../../libs/socket.js';
 
 const stopFlag = ref(false);
 
@@ -554,11 +554,7 @@ async function MatMul(Offsets, FlatData, BackwardTape, GradientTape, _iterations
 
 		//POST gradients and wait for response
 		// const newGradientValues = await postGradients(client_id, gradientValues, iteration);
-		await emitEvent('submit_gradients', {
-			client_id: client_id,
-			round_id: iteration,
-			gradient: gradientValues
-		})
+		const newGradientValues = await submitGradients(client_id, gradientValues, iteration);
 
 		const pollingEndTime = performance.now();
 		totalPollingTime += pollingEndTime - pollingStartTime;

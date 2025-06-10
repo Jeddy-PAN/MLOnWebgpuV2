@@ -17,14 +17,9 @@ const startTrain = async (dataset) => {
 
 	// stopFlag.value = false;
 
-	const dataArray: number[][] = dataset
-		.trim()
-		.split('\n')
-		.map((row) => row.split(',').map(Number));
-
-	const data = new Data(dataArray, 0, dataArray.length - 1, 2, 2, computeGraphStore.batchSize);
+	const data = new Data(dataset, 0, dataset.length - 1, 2, 2, computeGraphStore.batchSize);
 	data.dataSetName = 'classify';
-	console.log('data is ready', dataArray.length);
+	console.log('data is ready', dataset.length);
 
 	setUpModel(data);
 	// 	},

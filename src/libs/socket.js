@@ -2,6 +2,7 @@ import { io } from 'socket.io-client';
 import eventHub from './eventHub';
 
 let socket = null;
+const responseCallbacks = new Map();
 
 export async function initSocketConnection() {
     if(socket && socket.connected) {
@@ -37,7 +38,14 @@ export function initSocketListeners() {
     })
 
     socket.on('submit_gradients', (res) => {
-        eventHub.emit('submit_gradients', res);
+        // eventHub.emit('submit_gradients', res);
+        const result = res.data;
+        const {round_id, average_gradient} = result;
+        const resolve = responseCallbacks.get(round_id);
+        if(resolve) {
+            resolve(average_gradient);
+            responseCallbacks.delete(round_id);
+        }
     })
 
     socket.on('connect_error', (error) => {
@@ -73,6 +81,20 @@ export async function emitEvent(type, payload) {
         console.log('Socket Not Connected');
     }
     
+}
+
+export async function submitGradients(client_id, gradient, iteration) {
+    if(!socket||!socket.connected) {
+        throw new Error('Socket not established or not connected');
+    }
+    return new Promise((resolve) => {
+        responseCallbacks.set(iteration, resolve);
+        emitEvent('submit_gradients', {
+            client_id: client_id,
+			round_id: iteration,
+			gradient: gradient
+        })
+    })
 }
 
 export default socket;
