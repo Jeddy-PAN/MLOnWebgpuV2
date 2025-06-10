@@ -2,7 +2,7 @@ import mitt from 'mitt';
 
 const emitter = mitt();
 import { useSocketStore } from '../store/socketStore';
-import { startTrain } from '../utils/backend/CPU/tools/client';
+import { startTrain } from '../utils/backend/CPU/ModelSetup/setUpData';
 
 const eventHub = {
   on: emitter.on,
@@ -46,8 +46,12 @@ const eventHub = {
     // socketStore.setRawData(res.data);
     const dataset = res.data;
     console.log(dataset);
-    // startTrain(dataset);
+    startTrain(dataset);
   },
+
+  async handleSubmitGradients(res) {
+    console.log('submit:', res.data);
+  }
 
 };
 

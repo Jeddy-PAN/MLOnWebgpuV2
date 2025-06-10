@@ -41,7 +41,9 @@ import main from '../wgsl_operations/main.wgsl';
 import { getxValues, getPredValues, getTrueValues, getErrorValue, getGradientValues } from './testSet.js';
 import { ref } from 'vue';
 import { useComputeGraphStore } from '../../../../store/computeGraphStore.js';
+import { useSocketStore } from '../../../../store/socketStore.js';
 import { initWebSocket, postGradients } from './network.js';
+import { emitEvent } from '../../../../libs/socket.js';
 
 const stopFlag = ref(false);
 
@@ -59,13 +61,15 @@ function setFlagStop() {
 
 async function MatMul(Offsets, FlatData, BackwardTape, GradientTape, _iterations, data, model, forwardTape, gradientTape, backwardTape) {
 	const store = useComputeGraphStore();
-	const client_id = localStorage.getItem('client_id');
+	const socketStore = useSocketStore();
+	// const client_id = localStorage.getItem('client_id');
+	const client_id = socketStore.client_id;
 
 	// 初始化WebSocket连接
-	await initWebSocket(client_id);
+	// await initWebSocket(client_id);
 
 	const numIterations = _iterations;
-	const server_domain = 'http://localhost:8000';
+	// const server_domain = 'http://localhost:8000';
 
 	const adapter = await navigator.gpu.requestAdapter();
 	if (!adapter) {
@@ -549,7 +553,12 @@ async function MatMul(Offsets, FlatData, BackwardTape, GradientTape, _iterations
 		const pollingStartTime = performance.now();
 
 		//POST gradients and wait for response
-		const newGradientValues = await postGradients(client_id, gradientValues, iteration);
+		// const newGradientValues = await postGradients(client_id, gradientValues, iteration);
+		await emitEvent('submit_gradients', {
+			client_id: client_id,
+			round_id: iteration,
+			gradient: gradientValues
+		})
 
 		const pollingEndTime = performance.now();
 		totalPollingTime += pollingEndTime - pollingStartTime;

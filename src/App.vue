@@ -48,6 +48,7 @@ onMounted(() => {
 	eventHub.on('get_client_id', eventHub.handleGetId);
 	eventHub.on('ready_to_train', eventHub.handleReady);
 	eventHub.on('get_dataset', eventHub.handleGetData);
+	eventHub.on('submit_gradients', eventHub.handleSubmitGradients);
 })
 
 onUnmounted(() => {
@@ -56,6 +57,7 @@ onUnmounted(() => {
 	eventHub.off('get_client_id', eventHub.handleGetId);
 	eventHub.off('ready_to_train', eventHub.handleReady);
 	eventHub.off('get_dataset', eventHub.handleGetData);
+	eventHub.off('submit_gradients', eventHub.handleSubmitGradients);
 })
 
 
